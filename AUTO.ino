@@ -1,14 +1,20 @@
 void IRRead() {
   String value;
-  if (irrecv.decode(&results))
-  {
+
+  if (irrecv.decode(&results)) {
     Serial.println(results.value);
     value = String(results.value, HEX);
     Serial.println(value);
     irrecv.resume();
   }
-  if (value == "10") {
-  //if (value == "Ps4.up") {
+  if (value == "10") { // Apertou 1 no controle
+    //if (value == "Ps4.up") {
+    PS4.setLed(0, 0, 0);
+    PS4.sendToController();
+    delay(100);
+    PS4.setLed(0, 100, 100);
+    PS4.sendToController();
+
     if (autoState == STOPPED) {
       //Serial.println("ReadyToGo");
       autoState = READY;
@@ -17,16 +23,15 @@ void IRRead() {
       MotorWrite(90, 90);
       //CalibrateSensors();
     }
-  } else if (value == "810") {
-  //} else if (value == "Ps4.left") {
+  } else if (value == "810") { // Apertou 2 no controle
+    //} else if (value == "Ps4.left") {
     if (autoState == READY) {
       autoState = RUNNING;
       PS4.setLed(0, 100, 0);
       PS4.sendToController();
-      //Serial.println("LET'S GO!!!");
     }
-  } else if ( value == "410") {
-  //} else if ( value == "Ps4.right") {
+  } else if (value == "410") {
+    //} else if ( value == "Ps4.right") {
     if (autoState == RUNNING || autoState == READY) {
       //Serial.println("STOP");
       autoState = STOPPED;
@@ -37,104 +42,54 @@ void IRRead() {
   }
 }
 
-// void Teste(){
-//   Serial.println("TesteStart");
-//   if (!desempate) {
-//     unsigned int timerStart = millis() + 300;
-//     while (timerStart > millis()) {
-//       MotorWrite(120, 120);
-//     }
-//   }
-
-//   while (autoState == RUNNING) {
-//     while ((digitalRead(middleInfSensor) && digitalRead(leftInfSensor) && digitalRead(rightInfSensor) ) && autoState == RUNNING) {
-//       //Serial.println("NotFind");
-//       IRRead();
-//       //Status_Verify();
-//       if (right) {
-//         MotorWrite(95, 110);
-//       } else {
-//         MotorWrite(110, 95);
-//       }
-//     }
-//     right = !right;
-//     while ((!digitalRead(middleInfSensor) && !digitalRead(!leftInfSensor) && !digitalRead(!rightInfSensor)) && autoState == RUNNING) {
-
-//       if (!digitalRead(middleInfSensor)){
-//       //Serial.println("Find");
-//       IRRead();
-//       //Status_Verify();
-//       MotorWrite(150, 150);
-//       } else if (!digitalRead(!leftInfSensor)){
-//         while (digitalRead(middleInfSensor))
-//         {
-//           IRRead();
-//           MotorWrite(95, 110);
-//         }
-        
-//       } else if (!digitalRead(!rightInfSensor)){
-//           while (digitalRead(middleInfSensor))
-//         {
-//           IRRead();
-//           MotorWrite(110, 95);
-//         }
-//       }
-//     }
-//     while (autoState == STOPPED) {   
-//       IRRead();
-//       MotorWrite(0, 0);
-//       }
-//   }
-// }
-//
 void Movimentacao() {
   static int movimento = 0;
-  static bool direcao = true; 
-  int cont=0;
+  static bool direcao = true;
+  int cont = 0;
   rightInfSensor == digitalRead(rightInfSensor);
   leftInfSensor == digitalRead(leftInfSensor);
   middleInfSensor == digitalRead(middleInfSensor);
 
-  if (digitalRead(middleInfSensor)==true) {
+  if (digitalRead(middleInfSensor) == true) {
     MotorWrite(130, 130);
-  } else if (digitalRead(leftInfSensor)==true) {
+  } else if (digitalRead(leftInfSensor) == true) {
     MotorWrite(80, 95);
     delay(100);
-  } else if (digitalRead(rightInfSensor)==true) {
+  } else if (digitalRead(rightInfSensor) == true) {
     MotorWrite(100, 80);
     delay(100);
-  }else if (digitalRead(leftInfSensorRef)) {
+  } else if (digitalRead(leftInfSensorRef)) {
     MotorWrite(80, 95);
     delay(100);
   } else if (digitalRead(rightInfSensorRef)) {
     MotorWrite(100, 80);
     delay(100);
   }
-   if (direcao) {
-      //MotorWrite(-80, 100);
+  if (direcao) {
+    //MotorWrite(-80, 100);
     //  delay(100);
     //} else {
-     // MotorWrite(100, -80);
+    // MotorWrite(100, -80);
     //  delay(100);
     //}
     direcao = !direcao;
-  } else if(digitalRead(middleInfSensor)) {
+  } else if (digitalRead(middleInfSensor)) {
 
-    
-    do{
+
+    do {
       if (movimento < 2) {
-      MotorWrite(100,100);
-      direcao = true;
-    } else if (movimento < 1) {
-      MotorWrite(80, 80);
-      direcao = false;
-    } else {
-      movimento = 0; 
-    }
-    movimento++;
-    cont++;
-    
-    } while(cont<=50 || digitalRead(middleInfSensor)==false );
+        MotorWrite(100, 100);
+        direcao = true;
+      } else if (movimento < 1) {
+        MotorWrite(80, 80);
+        direcao = false;
+      } else {
+        movimento = 0;
+      }
+      movimento++;
+      cont++;
+
+    } while (cont <= 50 || digitalRead(middleInfSensor) == false);
     /*if (movimento < 2) {
       MotorWrite(100,100);
       direcao = true;
@@ -153,56 +108,50 @@ void Radar() {
   if (!desempate) {
     unsigned int timerStart = millis() + 300;
     while (timerStart > millis()) {
+      IRRead();
       MotorWrite(120, 120);
     }
   }
 
   while (autoState == RUNNING) {
-    while ((digitalRead(rightInfSensor) && digitalRead(leftInfSensor) && digitalRead(middleInfSensor)) && autoState == RUNNING) {
-      //Serial.println("NotFind");
+    while ((digitalRead(rightInfSensor) == 1 && digitalRead(leftInfSensor) == 1 && digitalRead(middleInfSensor) == 1) && autoState == RUNNING) {
+    
       IRRead();
-      //Status_Verify();
       if (right) {
-        MotorWrite(95, 110);
+        MotorWrite(115, 130);
       } else {
-        MotorWrite(110, 95);
+        MotorWrite(130, 115);
       }
     }
     right = !right;
-    while (!digitalRead(middleInfSensor) && autoState == RUNNING) {
-      //Serial.println("Find");
+    while (digitalRead(middleInfSensor) == 0 && autoState == RUNNING) {
       IRRead();
-      //Status_Verify();
       MotorWrite(150, 150);
     }
-    while (autoState == STOPPED) {   
+    while (autoState == STOPPED) {
       IRRead();
       MotorWrite(0, 0);
-      }
+      Status_Verify();
+    }
   }
 }
+
 void RadarInverso() {
-  Serial.println("RadarInversoStart");
+  //sensorTest();
+  Serial.println("RadarStart");
   if (!desempate) {
     unsigned int timerStart = millis() + 300;
     while (timerStart > millis()) {
+      IRRead();
       MotorWrite(120, 120);
     }
   }
 
   while (autoState == RUNNING) {
-    // Verifica se os sensores identificam um robô adversário
-    if (digitalRead(rightInfSensor) == LOW || digitalRead(leftInfSensor) == LOW || digitalRead(middleInfSensor) == LOW) {
-      // Realiza uma volta de ré
-      while (digitalRead(middleInfSensor) == LOW && autoState == RUNNING) {
-        IRRead();
-        MotorWrite(-120, -120); // Marcha ré
-      }
-      delay(200); // Delay para garantir que a volta de ré foi completada
-    }
+    while ((digitalRead(rightInfSensor) == 1 && digitalRead(leftInfSensor) == 1 && digitalRead(middleInfSensor) == 1) && autoState == RUNNING) {
+    //while ((digitalRead(middleInfSensor) == 1) && autoState == RUNNING) {
+      //Serial.println("                Not find");
     
-    // Avança para frente
-    while ((digitalRead(rightInfSensor) && digitalRead(leftInfSensor) && digitalRead(middleInfSensor)) && autoState == RUNNING) {
       IRRead();
       if (right) {
         MotorWrite(95, 110);
@@ -210,14 +159,31 @@ void RadarInverso() {
         MotorWrite(110, 95);
       }
     }
-    right = !right;
-    while (!digitalRead(middleInfSensor) && autoState == RUNNING) {
+
+    while (digitalRead(middleInfSensor) == 1){
+    
+      while (digitalRead(leftInfSensor) == 0 && autoState == RUNNING) {
+        //Serial.println("                Left find");
+        IRRead();
+        MotorWrite(115, 130);
+      }
+
+      while (digitalRead(rightInfSensor) == 0 && autoState == RUNNING) {
+        //Serial.println("                Right find");
+        IRRead();
+        MotorWrite(130, 115);
+      }
+    }
+
+    while (digitalRead(middleInfSensor) == 0 && autoState == RUNNING) {
+      //Serial.println("                find");
       IRRead();
       MotorWrite(150, 150);
     }
-    while (autoState == STOPPED) {   
+    while (autoState == STOPPED) {
       IRRead();
       MotorWrite(0, 0);
+      Status_Verify();
     }
   }
 }
@@ -227,23 +193,25 @@ void Suicidio() {
   if (!desempate) {
     unsigned int timerStart = millis() + 300;
     while (timerStart > millis()) {
+      IRRead();
       MotorWrite(120, 120);
     }
   }
 
-  while (autoState == RUNNING) {  
+  while (autoState == RUNNING) {
+    IRRead();
+    while (digitalRead(middleInfSensor) == 0) {
       IRRead();
-      while(!digitalRead(middleInfSensor)){
-        IRRead();
       MotorWrite(150, 150);
       PS4.setLed(100, 0, 0);
-      PS4.sendToController();
-      }
-      }
-  while (autoState == STOPPED) {   
-      IRRead();
-      MotorWrite(0, 0);
-      }
+      Status_Verify();
+    }
+  }
+  while (autoState == STOPPED) {
+    IRRead();
+    MotorWrite(0, 0);
+    Status_Verify();
+  }
 }
 
 void Auto() {
@@ -284,42 +252,42 @@ void Auto() {
   if (autoState == RUNNING) {
     if (tatic == SUICIDIO) {
       Suicidio();
-    } else if (tatic == MOVIMENTACAO){
+    } else if (tatic == MOVIMENTACAO) {
       Movimentacao();
     } else if (tatic == RADAR) {
       Radar();
     } else if (tatic == RADAR_INVERSO) {
       RadarInverso();
- 
-  // Verify leds controll
-  } else if (autoState == READY) {
-    MotorWrite(90, 90);
-    if (blinkTimer < millis()) {
-      if (ledOn) {
-        PS4.setLed(0, 0, 0);
-        PS4.sendToController();
-      } else {
-        PS4.setLed(0, 100, 0);
-        PS4.sendToController();
-      }
-      ledOn = !ledOn;
-      blinkTimer = millis() + 200;
-    }
-  } else if (autoState == STOPPED) {
-    MotorWrite(90, 90);
-    if (blinkTimer < millis()) {
-      if (ledOn) {
-        PS4.setLed(0, ledIntensity++, 0);
-        PS4.sendToController();
-      } else {
-        PS4.setLed(0, ledIntensity--, 0);
-        PS4.sendToController();
-      }
-      if (ledIntensity == 0 || ledIntensity == 100) {
+
+      // Verify leds controll
+    } else if (autoState == READY) {
+      MotorWrite(90, 90);
+      if (blinkTimer < millis()) {
+        if (ledOn) {
+          PS4.setLed(0, 0, 0);
+          PS4.sendToController();
+        } else {
+          PS4.setLed(0, 100, 0);
+          PS4.sendToController();
+        }
         ledOn = !ledOn;
+        blinkTimer = millis() + 200;
       }
-      blinkTimer = millis() + 10;
+    } else if (autoState == STOPPED) {
+      MotorWrite(90, 90);
+      if (blinkTimer < millis()) {
+        if (ledOn) {
+          PS4.setLed(0, ledIntensity++, 0);
+          PS4.sendToController();
+        } else {
+          PS4.setLed(0, ledIntensity--, 0);
+          PS4.sendToController();
+        }
+        if (ledIntensity == 0 || ledIntensity == 100) {
+          ledOn = !ledOn;
+        }
+        blinkTimer = millis() + 10;
+      }
     }
   }
-}
 }

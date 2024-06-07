@@ -1,6 +1,3 @@
-// Code made by Nick
-// Contact: nicolas_castrosilva@outlook.com
-
 //Servo Libraries
 
 #include <ESP32Servo.h>
@@ -44,7 +41,6 @@ void Radar();
 void fradar();
 void Auto();
 void ManualControl();
-void Teste();
 
 //Auto mode states of operation (1,2,3 TV controll)
 enum autoStates {
@@ -80,7 +76,8 @@ void setup() {
   irrecv.enableIRIn(); //Enable IR Receiver
 
   //Start Connection between ESP32 and PS4 Controller
-  PS4.begin("44:1c:a8:c6:41:80");
+  PS4.begin("44:1c:a8:c6:41:74");
+  // PS4.begin("f5:cd:c4:86:9f:00");
   while (!PS4.isConnected()) {
     Serial.println("WatingConnection");
     delay(250);
